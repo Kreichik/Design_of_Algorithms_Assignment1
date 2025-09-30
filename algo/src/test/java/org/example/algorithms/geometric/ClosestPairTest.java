@@ -51,6 +51,28 @@ class ClosestPairTest {
         }
     }
 
+    @Test
+    void testTwoPoints() {
+        Point[] points = {new Point(1, 1), new Point(4, 5)};
+        PointPair result = closestPair.findClosestPair(points);
+        assertEquals(5.0, result.distance, 0.001);
+    }
+
+    @Test
+    void testPointsOnVerticalLine() {
+        Point[] points = {
+                new Point(10, 0),
+                new Point(0, 100),
+                new Point(10, 5),
+                new Point(10, 8),
+                new Point(20, 20)
+        };
+        PointPair result = closestPair.findClosestPair(points);
+        assertEquals(3.0, result.distance, 0.001);
+    }
+
+
+
     private Point[] generateRandomPoints(int numPoints, int maxCoord) {
         Random rand = new Random();
         Point[] points = new Point[numPoints];

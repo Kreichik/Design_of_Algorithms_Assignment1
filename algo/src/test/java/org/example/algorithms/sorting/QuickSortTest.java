@@ -26,6 +26,14 @@ class QuickSortTest {
     }
 
     @Test
+    void testArrayWithAllElementsSame() {
+        int[] array = {7, 7, 7, 7, 7, 7};
+        int[] expected = {7, 7, 7, 7, 7, 7};
+        quickSort.sort(array);
+        assertArrayEquals(expected, array);
+    }
+
+    @Test
     void testSingleElementArray() {
         int[] array = {5};
         int[] expected = {5};

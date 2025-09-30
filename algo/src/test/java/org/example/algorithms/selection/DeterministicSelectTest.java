@@ -49,4 +49,13 @@ class DeterministicSelectTest {
         assertThrows(IllegalArgumentException.class, () -> deterministicSelect.select(array, 0));
         assertThrows(IllegalArgumentException.class, () -> deterministicSelect.select(array, 4));
     }
+
+    @Test
+    void testSelectOnTinyArray() {
+        int[] array = {4, 2, 1, 3};
+        assertEquals(1, deterministicSelect.select(array.clone(), 1));
+        assertEquals(2, deterministicSelect.select(array.clone(), 2));
+        assertEquals(3, deterministicSelect.select(array.clone(), 3));
+        assertEquals(4, deterministicSelect.select(array.clone(), 4));
+    }
 }
