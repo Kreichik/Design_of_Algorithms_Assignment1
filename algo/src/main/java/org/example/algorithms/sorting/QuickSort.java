@@ -1,5 +1,6 @@
 package org.example.algorithms.sorting;
 
+import org.example.algorithms.util.AlgoUtils;
 import org.example.metrics.Metrics;
 
 import java.util.Random;
@@ -25,7 +26,7 @@ public class QuickSort {
     private void quickSortLoop(int[] array, int left, int right, int depth, Metrics metrics) {
         while (left < right) {
             metrics.recordDepth(depth);
-            int pivotIndex = partition(array, left, right, metrics);
+            int pivotIndex = AlgoUtils.partition(array, left, right, random, metrics);
 
             if (pivotIndex - left < right - pivotIndex) {
                 quickSortLoop(array, left, pivotIndex - 1, depth + 1, metrics);
@@ -35,31 +36,5 @@ public class QuickSort {
                 right = pivotIndex - 1;
             }
         }
-    }
-
-    private int partition(int[] array, int left, int right, Metrics metrics) {
-        int pivotIndex = left + random.nextInt(right - left + 1);
-        int pivotValue = array[pivotIndex];
-        swap(array, pivotIndex, right, metrics);
-
-        int storeIndex = left;
-        for (int i = left; i < right; i++) {
-            metrics.incrementComparisons();
-            if (array[i] < pivotValue) {
-                swap(array, i, storeIndex, metrics);
-                storeIndex++;
-            }
-        }
-
-        swap(array, storeIndex, right, metrics);
-        return storeIndex;
-    }
-
-    private void swap(int[] array, int i, int j, Metrics metrics) {
-        if (i == j) return;
-        int temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-        metrics.incrementSwaps();
     }
 }
