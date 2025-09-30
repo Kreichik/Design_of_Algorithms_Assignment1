@@ -1,43 +1,73 @@
+// File: algo/src/main/java/org/example/App.java
 package org.example;
 
+import org.example.algorithms.sorting.MergeSort;
+import org.example.algorithms.sorting.QuickSort;
 import org.example.metrics.CsvWriter;
 import org.example.metrics.Metrics;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
-public class App {
-    public static void main(String[] args) {
-        System.out.println("Running metrics collection demo...");
+import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
-        String outputPath = "results/metrics.csv";
+@Command(name = "algo-runner", mixinStandardHelpOptions = true,
+        version = "algo-runner 1.0",
+        description = "Runs specified algorithms for given input sizes and records metrics.")
+public class App implements Callable<Integer> {
+
+    @Parameters(index = "0", description = "The algorithm(s) to run. Can be 'mergesort', 'quicksort'.")
+    private String[] algorithms;
+
+    @Option(names = {"-n", "--sizes"}, required = true, split = ",", description = "Comma-separated list of input sizes (e.g., 100,1000,10000).")
+    private int[] sizes;
+
+    @Option(names = {"-o", "--output"}, defaultValue = "results/metrics.csv", description = "Output CSV file path.")
+    private String outputPath;
+
+    private final Random random = new Random();
+
+    @Override
+    public Integer call() throws Exception {
         CsvWriter csvWriter = new CsvWriter(outputPath);
-        Metrics metrics = new Metrics();
+        System.out.println("Starting experiments. Results will be saved to " + outputPath);
 
-        int n = 100;
+        for (String algoName : algorithms) {
+            for (int n : sizes) {
+                System.out.printf("Running %s for n = %d...%n", algoName, n);
 
-        long startTime = System.nanoTime();
-        dummyRecursiveFunction(0, n, 1, metrics); // Начальная глубина 1
-        long endTime = System.nanoTime();
+                int[] array = random.ints(n, -n, n).toArray();
+                Metrics metrics = null;
 
-        metrics.setExecutionTime(endTime - startTime);
-        csvWriter.writeMetrics("DummyAlgorithm", n, metrics);
+                switch (algoName.toLowerCase()) {
+                    case "mergesort":
+                        MergeSort mergeSort = new MergeSort();
+                        metrics = mergeSort.sort(array.clone());
+                        break;
+                    case "quicksort":
+                        QuickSort quickSort = new QuickSort();
+                        metrics = quickSort.sort(array.clone());
+                        break;
+                    default:
+                        System.err.println("Unknown algorithm: " + algoName);
+                        continue;
+                }
 
-        System.out.println("Metrics collected: " + metrics);
-        System.out.println("Results saved to " + outputPath);
+                if (metrics != null) {
+                    csvWriter.writeMetrics(algoName, n, metrics);
+                }
+            }
+        }
+
+        System.out.println("All experiments finished.");
+        return 0;
     }
 
-    private static void dummyRecursiveFunction(int start, int end, int depth, Metrics metrics) {
-        metrics.recordDepth(depth);
-
-        if (end - start <= 1) {
-            return;
-        }
-
-        for(int i = 0; i < 5; i++) {
-            metrics.incrementComparisons();
-        }
-        metrics.incrementSwaps();
-
-        int mid = start + (end - start) / 2;
-        dummyRecursiveFunction(start, mid, depth + 1, metrics);
-        dummyRecursiveFunction(mid, end, depth + 1, metrics);
+    public static void main(String[] args) {
+        int exitCode = new CommandLine(new App()).execute(args);
+        System.exit(exitCode);
     }
 }
