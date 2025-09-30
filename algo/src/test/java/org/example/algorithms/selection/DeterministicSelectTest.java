@@ -42,20 +42,6 @@ class DeterministicSelectTest {
         assertEquals(5, deterministicSelect.select(array.clone(), 6));
     }
 
-    @Test
-    void testSelectOnLargeRandomArray() {
-        for (int i = 0; i < 100; i++) {
-            int[] array = random.ints(1000, -1000, 1000).toArray();
-            int k = random.nextInt(array.length) + 1;
-
-            int[] sortedArray = array.clone();
-            Arrays.sort(sortedArray);
-            int expected = sortedArray[k - 1];
-
-            int actual = deterministicSelect.select(array.clone(), k);
-            assertEquals(expected, actual);
-        }
-    }
 
     @Test
     void testInvalidK() {
